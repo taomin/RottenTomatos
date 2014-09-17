@@ -30,19 +30,18 @@
 }
 
 - (void)viewDidLayoutSubviews {
-    [super viewDidLayoutSubviews];
-        [self.ScrollView layoutIfNeeded];
-    [self.movieDescription sizeToFit];
-    [self.movieTitle sizeToFit];
     
+    [super viewDidLayoutSubviews];
+    [self.ScrollView layoutIfNeeded];
+    [self.movieDescription sizeToFit];
     CGRect contentRect = CGRectZero;
     
     for (UIView *subview in self.ContentView.subviews) {
         contentRect = CGRectUnion(contentRect, subview.frame);
     }
-    
-    self.ScrollView.contentSize = contentRect.size;
 
+    self.ScrollView.contentSize = contentRect.size;
+    
 }
 
 - (void)setMovieDetails:(NSDictionary *)movie {
@@ -51,6 +50,7 @@
 }
 
 - (void)initMovieView {
+    
     self.movieTitle.text = self->movieDetails[@"title"];
     self.movieDescription.text = self->movieDetails[@"synopsis"];
 
