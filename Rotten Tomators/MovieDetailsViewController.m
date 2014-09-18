@@ -25,7 +25,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.title = @"Movie Details";
     [self initMovieView];
 }
 
@@ -51,6 +50,7 @@
 
 - (void)initMovieView {
     
+    self.title = self->movieDetails[@"title"];
     self.movieTitle.text = self->movieDetails[@"title"];
     self.movieDescription.text = self->movieDetails[@"synopsis"];
 
