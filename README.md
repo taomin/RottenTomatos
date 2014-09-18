@@ -12,6 +12,6 @@ Fetch hot movie lists from RottenTomato's public api and display it
 - 
 - Preview gif:
 
-![RottenTomato|350](http://imgur.com/liWm4c1)
+![RottenTomato|350](http://i.imgur.com/liWm4c1.gif)
 
 
