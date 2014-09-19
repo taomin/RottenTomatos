@@ -9,9 +9,10 @@ Fetch hot movie lists from RottenTomato's public api and display it
 - User sees error message when there's a networking error.
 - User can pull to refresh the movie list.
 - For the large poster, load the low-res image first, switch to high-res when complete.
+- User can search movies. it calls movie search api. User can search it and click on it to read movie details
 
 - Preview gif:
 
-![RottenTomato|350](http://i.imgur.com/liWm4c1.gif)
+![RottenTomato|350](http://i.imgur.com/I2vIcka.gif)
 
 
