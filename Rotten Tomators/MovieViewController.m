@@ -17,12 +17,13 @@ NSString* const apikey = @"mcbsgchmqhgtmrrgqgnntb75";
 @interface MovieViewController () {
     //private members
     UIRefreshControl *refreshControl;
+    UISearchBar *searchBar;
+    UISearchDisplayController *searchController;
     BOOL showHud;
 }
 @property (strong, nonatomic) IBOutlet UITableView *movieTable;
 @property (strong, nonatomic) NSArray *movies;
-//@property (strong, nonatomic) IBOutlet UIView *errorView;
-//@property (strong, nonatomic) IBOutlet UILabel *errorLabel;
+@property (copy) NSArray *moviesBackup;
 @property (strong, nonatomic) UILabel *errorMessage;
 @end
 
@@ -54,11 +55,22 @@ NSString* const apikey = @"mcbsgchmqhgtmrrgqgnntb75";
     [self.movieTable addSubview:refreshControl];
     [self->refreshControl addTarget:self action:@selector(reloadTable:) forControlEvents:UIControlEventValueChanged];
     
+    
+    self->searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+    self->searchBar.delegate = self;
+    self.movieTable.tableHeaderView = self->searchBar;
+    
+    self->searchController = [[UISearchDisplayController alloc] initWithSearchBar:self->searchBar contentsController:self];
+    self->searchController.searchResultsDataSource = self;
+    self->searchController.searchResultsDelegate = self;
+    [self->searchController.searchResultsTableView registerNib:[UINib nibWithNibName:@"MovieCell" bundle:nil] forCellReuseIdentifier:@"MovieCell"];
+    self->searchController.searchResultsTableView.rowHeight = 100;
+    self->searchController.delegate = self;
+    
     self->showHud = YES;
     [self reloadTable:self];
     self->showHud = NO;
 }
-
 - (void)reloadTable:(MovieViewController*)sender {
     //reload movie list
     
@@ -82,7 +94,8 @@ NSString* const apikey = @"mcbsgchmqhgtmrrgqgnntb75";
             //callback here
             NSDictionary *object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
             
-            self.movies = object[@"movies"];
+            self.movies = self.moviesBackup = object[@"movies"];
+            
             [self.movieTable reloadData];
         } else {
             self.errorMessage.hidden = NO;
@@ -90,6 +103,37 @@ NSString* const apikey = @"mcbsgchmqhgtmrrgqgnntb75";
         }
     }];
         
+}
+
+#pragma mark - UISearchDisplayController Delegate Methods
+-(BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString {
+    
+    NSString *urlString = [NSString stringWithFormat:@"http://api.rottentomatoes.com/api/public/v1.0/movies.json?apikey=%@&q=%@", apikey, searchString];
+    
+    NSURLRequest *request = [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:urlString]];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue]  completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+        
+        if (!connectionError) {
+            //callback here
+            NSDictionary *object = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+            
+            self.movies = object[@"movies"];
+            [self->searchController.searchResultsTableView reloadData];
+        } else {
+            self.errorMessage.hidden = NO;
+            [self.view bringSubviewToFront:self.errorMessage];
+        }
+    }];
+
+    return YES;
+}
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
+
+    self.movies = self.moviesBackup;
+    [self.movieTable reloadData];
+
 }
 
 - (void)didReceiveMemoryWarning {
@@ -104,13 +148,17 @@ NSString* const apikey = @"mcbsgchmqhgtmrrgqgnntb75";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
+
     NSDictionary *movie = self.movies[indexPath.row];
     
     MovieCell *movieCell = [tableView dequeueReusableCellWithIdentifier:@"MovieCell"];
 
+    NSLog(@"after get movie cell, %@", movieCell);
+    
     movieCell.headline.text = movie[@"title"];
     movieCell.summary.text = movie[@"synopsis"];
     [movieCell.thumbnail setImageWithURL:[NSURL URLWithString:[movie valueForKeyPath:   @"posters.thumbnail"]]];
+    NSLog(@"set movie cell, %@", movieCell);
     return movieCell;
 }
 

@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MovieViewController : UIViewController <UITableViewDelegate,UITableViewDataSource,NSURLConnectionDelegate>
+@interface MovieViewController : UIViewController <UITableViewDelegate,UITableViewDataSource,UISearchBarDelegate,UISearchDisplayDelegate>
 
 @end
